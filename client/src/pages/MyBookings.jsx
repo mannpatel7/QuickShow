@@ -4,19 +4,38 @@ import Loading from "../components/Loading";
 import BlurCircle from "../components/BlurCircle";
 import timeFormat from "../lib/timeformat";
 import {dateFormat} from "../lib/dateformat";
+import { useAppContext } from "../context/AppContext";
 const MyBookings = () => {
     const currency=import.meta.env.VITE_CURRENCY
 
+    const {axios,getToken,user}=useAppContext();
+    
     const[bookings,setBookings]=useState([])
     const [isLoading,setIsLoading]=useState(true)
 
-    const getMyBookings=async()=>{
-        setBookings(dummyBookingData)
-        setIsLoading(false)
+    
+    const getMyBookings = async () => {
+    try {
+      const { data } = await axios.get("/api/user/bookings", {
+        headers: {
+          Authorization: `Bearer ${await getToken()}`,
+        },
+      });
+
+      if (data.success) {
+        setBookings(data.bookings);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to fetch bookings");
     }
+    setIsLoading(false);
+  };
     useEffect(()=>{
-        getMyBookings()
-    },[])
+        if(user){getMyBookings()}
+    },[user])
     return !isLoading ? (
         
     <div className="relative px-6 md:px-16 lg:px40 pt-30 md:pt-40 min-h-[80vh]">

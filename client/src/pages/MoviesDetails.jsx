@@ -8,6 +8,8 @@ import timeFormat from "../lib/timeformat";
 import DateSelect from "../components/DateSelect";
 import MovieCard from "../components/MovieCard";
 import Loading from "../components/Loading";
+import { useAppContext } from "../context/AppContext";
+import toast from "react-hot-toast";
 
 
 const MoviesDetails = () => {
@@ -15,15 +17,36 @@ const MoviesDetails = () => {
     const {id}=useParams();
     const [show,setShow]=useState(null);
 
-    const getShow=async()=>{
-        const show=dummyShowsData.find(show=>show._id===id);
-        if(show){
-            setShow({
-            movie:show,
-            dateTime:dummyDateTimeData
-        })}
-        
-    };
+    const {shows, axios,getToken,user, fetchFavoriteMovies, favoriteMovies}=useAppContext();
+
+    const getShow = async () => {
+  try {
+    const { data } = await axios.get(`/api/shows/${id}`);
+    if (data.success) {
+      setShow({
+        movie: data.movie,
+        dateTime: data.dateTime
+      });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+    const handleFavorite=async ()=>{
+        try{
+            if(!user) return toast.error("Please login to proceed")
+            
+                const {data}=await axios.post("/api/user/update-favorite", {movieId: id}, {headers: {Authorization: `Bearer ${await getToken()}`}})
+
+                if(data.success){
+                    await fetchFavoriteMovies()
+                    toast.success(data.message)
+                }
+        }catch(error){
+            console.log(error)
+        }
+    }
     useEffect(()=>{
         getShow();
     },[id]);
@@ -46,8 +69,7 @@ title}</h1>
 </div>
 <p className="text-gray-400 mt-2 text-sm leading-tight max-w-xl">{show.movie.overview}</p>
 <p>
-{timeFormat(show.movie.runtime)} . {show.movie.genres.map(genre =>
-genre.name).join(", ")} . {show.movie.release_date.split("-")[0]}
+{timeFormat(show.movie.runtime)} . {show.movie.genres.join(", ")} . {show.movie.release_date.split("-")[0]}
 </p>
 
 <div className='flex items-center flex-wrap gap-4 mt-4'>
@@ -56,8 +78,8 @@ genre.name).join(", ")} . {show.movie.release_date.split("-")[0]}
 Watch Trailer
 </button>
 <a href="#dateSelect" className="px-10 py-3 text-sm bg-primary hover:bg-primary-dull transition rounded-md font-medium cursor-pointer active:scale-95">Buy Tickets</a>
-<button className="bg-gray-700 p-2.5 rounded-full transition cursor-pointer active:scale-95">
-<Heart className={`w-5 h-5`}/>
+<button onClick={handleFavorite}className="bg-gray-700 p-2.5 rounded-full transition cursor-pointer active:scale-95">
+<Heart className={`w-5 h-5-${favoriteMovies.find(movie=>movie._id===id) ? 'fill-primary text-primary':""}`}/>
 </button>
 </div>
 </div>
@@ -67,17 +89,20 @@ Watch Trailer
 <div className="overflow-x-auto no-scrollbar mt-8 pb-4">
         <div className="flex items-center gap-2 w-max px-4">
             {show.movie.casts.slice(0,12).map((cast,index)=>(
-                <div key={index} className="flex flex-col items-center text-center">
-                    <img src={cast.profile_path} alt="" className="rounded-full h-20 w-20 md:h-20 object-cover"/>
-                    <p className="font-medium text-xs mt-3">{cast.name}</p>
-                    </div>
-            ))}
+  <div key={index} className="flex flex-col items-center">
+    <div className="rounded-full h-20 w-20 bg-gray-700 flex items-center justify-center">
+      {cast[0]}
+    </div>
+    <p className="text-xs mt-2">{cast}</p>
+  </div>
+))
+}
         </div>
     </div>
     <DateSelect dateTime={show.dateTime} id={id}/>
     <p className="text-lg font-medium mt-20 mb-8">You may Also like</p>
     <div className="grid grid-cols-1 place-items-center md:grid-cols-3 lg:grid-cols-4 gap-8">
-            {dummyShowsData.slice(0,4).map((movie,index)=>(
+            {shows.slice(0,4).map((movie,index)=>(
                 <MovieCard key={index} movie={movie}/>
                 
             ))}

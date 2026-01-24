@@ -1,7 +1,7 @@
 import { clerkClient } from "@clerk/express";
 import Booking from "../models/Booking.js";
 import Movie from "../models/Movie.js";
-import { err } from "inngest/types";
+
 
 export const getUserBookings=async (req,res)=>{
 
@@ -36,7 +36,7 @@ export const updateFavourite=async(req,res)=>{
         }
 
 
-        await clerkClient.users.updateUserMetadata(userId,{privateMEtadata: user.privateMetadata})
+        await clerkClient.users.updateUserMetadata(userId,{privateMetadata: user.privateMetadata})
 
         res.json({success:true,message:"Favourite movies updated successfully"})
     }catch(error){
@@ -47,7 +47,7 @@ export const updateFavourite=async(req,res)=>{
 
 export const getFavourites=async (req,res)=>{
     try {
-        const user=await clerkClient.users.getUser(req.auth().userId)
+        const user=await clerkClient.users.getUser(req.auth.userId)
         const favorites=user.privateMetadata.favorites;
 
         const movies=await Movie.find({_id:{$in: favorites}})

@@ -1,9 +1,13 @@
 import React from "react";
-import { dummyShowsData } from "../assets/assets";
 import MovieCard from "../components/MovieCard";
 import BlurCircle from "../components/BlurCircle";
+import { useAppContext } from "../context/AppContext";
 const Favourite = () => {
-    return dummyShowsData.length>0 ?(
+
+    const {favoriteMovies}=useAppContext()
+
+
+    return favoriteMovies.length>0 ?(
     <div className="relative my-40 mb-60 px-8 md:px-16 lg:px-40 xl:px-44 overflow-hidden min-h-[80vh]">
 
         <BlurCircle top="150px" left="0px"/>
@@ -11,7 +15,7 @@ const Favourite = () => {
 
         <h1 className="text-lg font-medium mb-8">Your Favourite Movies</h1>
         <div className="grid grid-cols-1 place-items-center md:grid-cols-3 lg:grid-cols-4 gap-8">
-            {dummyShowsData.map((movie)=>(
+            {favoriteMovies.map((movie)=>(
                 <MovieCard movie={movie} key={movie._id}/>
             ))}
         </div>

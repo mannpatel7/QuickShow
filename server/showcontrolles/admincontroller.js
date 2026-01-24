@@ -1,9 +1,35 @@
 import Booking from "../models/Booking.js";
 import Show from "../models/Show.js";
+import User from "../models/User.js"; 
+import { clerkClient } from "@clerk/express";
 
-export const isAdmin=async (req,res)=>{
-    res.json({success:true,isAdmin:true});
-}
+
+
+
+export const isAdmin = async (req, res) => {
+  try {
+    const auth = req.auth();
+    const userId = auth?.userId;
+
+    if (!userId) {
+      return res.json({ success: true, isAdmin: false });
+    }
+
+    const user = await clerkClient.users.getUser(userId);
+
+    const isAdmin = user.privateMetadata?.role === "admin";
+
+    console.log("ADMIN CHECK RESULT:", isAdmin);
+
+    return res.json({ success: true, isAdmin });
+  } catch (error) {
+    console.error("IS ADMIN ERROR:", error);
+    return res.json({ success: false, isAdmin: false });
+  }
+};
+
+
+
 
 export const getDashboardData=async (req,res)=>{
     try{

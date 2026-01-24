@@ -18,9 +18,14 @@ import Dashboard  from "./pages/admin/Dashboard";
 import ListShows from "./pages/admin/ListShows";
 import AddShows from "./pages/admin/AddShows";
 import ListBookings from "./pages/admin/ListBookings";
+import { useAppContext } from "./context/AppContext";
+import { SignIn } from "@clerk/clerk-react";
+import Loading from "./components/Loading";
 
 const App = () => {
   const isAdminroute=useLocation().pathname.startsWith("/admin");
+
+  const {user}=useAppContext()
   return (
     <>
       <Toaster /> {/*for toast notifications */}
@@ -32,11 +37,16 @@ const App = () => {
         <Route path="/movies/:id" element={<MoviesDetails />} />
         <Route path="/movies/:id/:date" element={<Seatlayout />} />
         <Route path="/my-bookings" element={<MyBookings />} />
+        <Route path="/loading/:nexturl" element={<Loading />} />
         <Route path="/favourite" element={<Favourite />} />
         <Route path="/about" element={<AboutUs />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/privacy" element={<Privacy />} />
-        <Route path="/admin/*" element={<Layout/>}>
+        <Route path="/admin/*" element={user ? <Layout/>:(
+          <div className="min-h-screen flex justify-center items-center">
+            <SignIn fallbackRedirectUrl={'/admin'} />
+          </div>
+        )}>
          {/* here * represents all badhane aapi dese layout */}
           <Route index element={<Dashboard/>} />
           <Route path="add-shows" element={<AddShows/>} />

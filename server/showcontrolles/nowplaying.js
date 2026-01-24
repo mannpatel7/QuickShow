@@ -32,7 +32,7 @@ export const getNowPlayingMovies = async (req, res) => {
       if (response.data && response.data.Response === "True") {
         const omdbMovie = response.data;
 
-        // Check if movie already exists
+       
         let movie = await Movie.findOne({ id: omdbMovie.imdbID });
 
         if (!movie) {
@@ -54,14 +54,14 @@ export const getNowPlayingMovies = async (req, res) => {
           await movie.save();
         }
 
-        movies.push(movie); // Return MongoDB movie
+        movies.push(movie); 
       }
     }
 
     res.json({ success: true, nowPlaying: movies });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Failed to fetch movies" });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
