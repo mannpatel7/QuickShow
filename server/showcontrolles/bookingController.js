@@ -1,3 +1,4 @@
+import { inngest } from "../ingest/inngest.js";
 import Booking from "../models/Booking.js";
 import Show from "../models/Show.js";
 import Stripe from "stripe";
@@ -7,12 +8,17 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 // Check seat availability
 const checkSeatAvailability = async (showId, selectedSeats) => {
   try {
-    const showData = await Show.findById(showId);
-    if (!showData) return false;
+    const bookings = await Booking.find({
+      show: showId,
+      // block both paid and unpaid bookings
+      isPaid: { $in: [true, false] }
+    });
 
-    const occupiedSeats = showData.occupiedSeats;
-    const isAnySeatTaken = selectedSeats.some(
-      (seat) => occupiedSeats[seat]
+    let occupiedSeats = [];
+    bookings.forEach(b => occupiedSeats.push(...b.bookedSeats));
+
+    const isAnySeatTaken = selectedSeats.some(seat =>
+      occupiedSeats.includes(seat)
     );
 
     return !isAnySeatTaken;
@@ -21,6 +27,7 @@ const checkSeatAvailability = async (showId, selectedSeats) => {
     return false;
   }
 };
+
 
 // Create Booking
 export const createBooking = async (req, res) => {
@@ -77,6 +84,13 @@ export const createBooking = async (req, res) => {
     booking.paymentLink = session.url;
     await booking.save();
 
+    await inngest.send({
+      name: "app/checkpayment",
+      data:{
+        bookingId:booking._id.toString()
+      }
+    })
+
     res.json({
       success: true,
       url: session.url,
@@ -88,12 +102,20 @@ export const createBooking = async (req, res) => {
 };
 
 // Get occupied seats
+// Get occupied seats (from PAID bookings only)
 export const getOccupiedSeats = async (req, res) => {
   try {
     const { showId } = req.params;
-    const showData = await Show.findById(showId);
 
-    const occupiedSeats = Object.keys(showData.occupiedSeats);
+    const bookings = await Booking.find({
+      show: showId,
+      isPaid: true
+    });
+
+    let occupiedSeats = [];
+    bookings.forEach(b => {
+      occupiedSeats.push(...b.bookedSeats);
+    });
 
     res.json({ success: true, occupiedSeats });
   } catch (error) {
@@ -101,3 +123,4 @@ export const getOccupiedSeats = async (req, res) => {
     res.json({ success: false, message: error.message });
   }
 };
+

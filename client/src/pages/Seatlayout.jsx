@@ -56,12 +56,24 @@ const renderSeats = (row, count = 8)=>(
                 {Array.from({ length: count }, (_, i) => {
                     const seatId =`${row}${i + 1}` ;
 return (
-<button key={seatId} onClick={() => handleSeatClick
-(seatId)} className={ `h-8 w-8 rounded border border-primary/
-60 cursor-pointer ${selectedSeats.includes(seatId) &&
-"bg-primary text-white"} ${occupiedSeats.includes(seatId) && "opacity-50"}` }>
-{seatId}
+<button
+  key={seatId}
+  disabled={occupiedSeats.includes(seatId)}
+  onClick={() => handleSeatClick(seatId)}
+  className={`h-8 w-8 rounded border text-xs transition
+    ${
+      occupiedSeats.includes(seatId)
+        ? "bg-gray-500 text-white cursor-not-allowed"
+        : selectedSeats.includes(seatId)
+        ? "bg-primary text-white"
+        : "border-primary/60 hover:bg-primary/20"
+    }
+  `}
+>
+  {seatId}
 </button>
+
+
 
 );
 
@@ -70,18 +82,23 @@ return (
 </div>
 )
 
-const getOccupiedSeats=async ()=>{
-    try {
-        const {data}=await axios.get(`/api/booking/seats/${selectedTime.showId}`)
-        if(data.success){
-            setOccupiedSeats(data.occupiedSeats)
-        }else{
-            toast.error(data.message)
-        }
-    } catch(error){
-        console.log(error)
+const getOccupiedSeats = async () => {
+  try {
+    const { data } = await axios.get(`/api/booking/seats/${selectedTime.showId}`);
+    console.log("occupiedSeats from API:", data.occupiedSeats);
+
+    if (data.success) {
+    const uniqueSeats = [...new Set(data.occupiedSeats.map(s => s.toUpperCase()))];
+    setOccupiedSeats(uniqueSeats);
+
+    } else {
+      toast.error(data.message);
     }
-}
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 
 const bookTickets=async ()=>{
     try {
@@ -104,11 +121,13 @@ useEffect(()=>{
     getShow()
 },[])
 
-useEffect(()=>{
-    if(selectedTime){
-        getOccupiedSeats()
-    }
-},[selectedTime])
+useEffect(() => {
+  if (selectedTime) {
+    setSelectedSeates([]);   // clear old selection
+    getOccupiedSeats();
+  }
+}, [selectedTime]);
+
 return show ?(
     <div className="flex flex-col md:flex-row px-6 md:px-16 lg:px-40 py-30 md:pt-50">
         {/* Available Timings */}
@@ -116,7 +135,9 @@ return show ?(
             <p className="text-lg font-semibold px-6">Available Timings</p>
             <div className="mt-5 space-y-1">
                 {show.dateTime?.[date]?.map((item)=>(
-                    <div key={item.time} onClick={()=>setSelectedTime(item)} className={`flex h-9 items-center gap-2 px-6 w-max rounded-r-md cursor-pointer transition ${selectedTime?.time===item.time ? "bg-primary text-white":"hover:bg-primary/20"}`}>
+                    <div key={item.time} onClick={()=>{
+                        console.log("selectedTime:", item);
+                        setSelectedTime(item);}} className={`flex h-9 items-center gap-2 px-6 w-max rounded-r-md cursor-pointer transition ${selectedTime?.time===item.time ? "bg-primary text-white":"hover:bg-primary/20"}`}>
                         <ClockIcon className="w-4 h-4" />
                         <p className="text-sm">{isoTimeFormat(item.time)}</p>
                     

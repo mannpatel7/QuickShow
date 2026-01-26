@@ -1,8 +1,10 @@
 import stripe from "stripe";
 import Booking from "../models/Booking.js";
+import Show from "../models/Show.js";
+
+const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY);
 
 export const stripeWebhooks = async (request, response) => {
-  const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY);
   const sig = request.headers["stripe-signature"];
 
   let event;
@@ -14,7 +16,7 @@ export const stripeWebhooks = async (request, response) => {
       process.env.STRIPE_WEBHOOK_SECRET
     );
   } catch (error) {
-    return response.status(400).send(`webhook Error:${error.message}`);
+    return response.status(400).send(`Webhook Error: ${error.message}`);
   }
 
   try {
@@ -22,17 +24,31 @@ export const stripeWebhooks = async (request, response) => {
       case "payment_intent.succeeded": {
         const paymentIntent = event.data.object;
 
+        // get checkout session from payment intent
         const sessionList = await stripeInstance.checkout.sessions.list({
           payment_intent: paymentIntent.id,
         });
 
         const session = sessionList.data[0];
-        const { bookingId } = session.metadata;
 
-        await Booking.findByIdAndUpdate(bookingId, {
-          isPaid: true,
-          paymentLink: "",
+        const { bookingId, showId, seats } = session.metadata;
+        const bookedSeats = JSON.parse(seats);
+
+        // mark booking paid
+        const booking = await Booking.findByIdAndUpdate(
+          bookingId,
+          { isPaid: true, paymentLink: "" },
+          { new: true }
+        );
+
+        // update show occupied seats
+        const show = await Show.findById(showId);
+
+        bookedSeats.forEach(seat => {
+          show.occupiedSeats[seat] = booking.user.toString();
         });
+
+        await show.save();
 
         break;
       }
