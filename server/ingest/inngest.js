@@ -1,7 +1,9 @@
-import { Inngest } from "inngest";
+import { Inngest, step } from "inngest";
 import User from "../models/User.js";
 import Booking from "../models/Booking.js";
 import Show from "../models/Show.js";
+import { model } from "mongoose";
+import sendEmail from "../configs/nodeMailer.js";
 
 // Create a client to send and receive events
 export const inngest = new Inngest({ id: "my-app" });
@@ -68,5 +70,40 @@ const releaseSeatsAndDeleteBooking=inngest.createFunction(
     }
 )
 
+//for send email
+const sendBookingConfirmationEmail=inngest.createFunction(
+    {id: "send-booking-confirmation-email"},
+    {event: "app/show.booked"},
+    async ({event,step})=>{
+        const {bookingId}=event.data;
+
+        const booking=await Booking.findById(bookingId).populate({
+            path:'show',
+            populate:{
+                path:'movie',model:"Movie"
+            }
+        }).populate('user');
+
+       await sendEmail({
+  to: booking.user.email,
+  subject: `Payment Confirmation – "${booking.show.movie.title}" Booking Successful`,
+  body: `
+Hi ${booking.user.name},
+
+🎉 Payment Successful! Your booking is confirmed.
+
+Movie: ${booking.show.movie.title}
+Date & Time: ${booking.show.time}
+Seats: ${booking.bookedSeats.join(", ")}
+Amount Paid: ₹${booking.amount}
+
+Enjoy your show!
+
+– QuickShow Team
+`
+});
+
+    }
+)
 // Create an empty array where we'll export future Inngest functions
-export const functions = [Synccreation,Syncdeletion,Syncupdation, releaseSeatsAndDeleteBooking];
+export const functions = [Synccreation,Syncdeletion,Syncupdation, releaseSeatsAndDeleteBooking,sendBookingConfirmationEmail];
