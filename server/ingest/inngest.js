@@ -1,4 +1,4 @@
-import { Inngest, step } from "inngest";
+import { Inngest } from "inngest";
 import User from "../models/User.js";
 import Booking from "../models/Booking.js";
 import Show from "../models/Show.js";
@@ -6,7 +6,9 @@ import { model } from "mongoose";
 import sendEmail from "../configs/nodeMailer.js";
 
 // Create a client to send and receive events
-export const inngest = new Inngest({ id: "my-app" });
+export const inngest = new Inngest({ id: "my-app",
+    eventKey: process.env.INNGEST_EVENT_KEY
+ });
 
 const Synccreation=inngest.createFunction(
     {id:'sync-user-from-clerk'},
@@ -84,7 +86,7 @@ const sendBookingConfirmationEmail=inngest.createFunction(
             }
         }).populate('user');
 
-       await sendEmail({
+    await sendEmail({
   to: booking.user.email,
   subject: `Payment Confirmation – "${booking.show.movie.title}" Booking Successful`,
   body: `

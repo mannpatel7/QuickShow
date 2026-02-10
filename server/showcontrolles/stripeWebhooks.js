@@ -51,10 +51,15 @@ export const stripeWebhooks = async (request, response) => {
 
         await show.save();
 
-        await inngest.send({
-          name:"app/show.booked",
-          data:{ bookingId}
-        })
+        console.log("📨 Sending Inngest event for booking:", bookingId);
+
+        const result = await inngest.send({
+          name: "app/show.booked",
+          data: { bookingId }
+});
+
+        console.log("✅ Inngest send result:", result);
+
         break;
       }
 
