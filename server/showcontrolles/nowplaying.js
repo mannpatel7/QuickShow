@@ -48,7 +48,8 @@ export const getNowPlayingMovies = async (req, res) => {
             genres: omdbMovie.Genre ? omdbMovie.Genre.split(",") : [],
             casts: omdbMovie.Actors ? omdbMovie.Actors.split(",") : [],
             vote_average: parseFloat(omdbMovie.imdbRating) || 0,
-            runtime: parseInt(omdbMovie.Runtime) || 0
+            runtime: parseInt(omdbMovie.Runtime) || 0,
+trailer_link: `https://www.youtube.com/results?search_query=${encodeURIComponent(omdbMovie.Title + " trailer")}`
           });
 
           await movie.save();

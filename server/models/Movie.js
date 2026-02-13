@@ -7,13 +7,14 @@ title: {type: String, required: true},
 overview: {type: String, required: true},
 poster_path: {type: String, required: true},
 backdrop_path: {type: String, required: true},
-release_date: {type: String, required: true},
+release_date: {type: Date, required: true},
 original_language: {type: String},
 tagline: {type: String},
 genres: {type: Array, required: true},
 casts: {type: Array, required: true},
 vote_average: {type: Number, required: true},
 runtime: {type: Number, required: true},
+trailer_link: {type: String, required: true}
 
 }, {timestamps: true}
 );

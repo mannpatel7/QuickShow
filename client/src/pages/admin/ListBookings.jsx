@@ -44,7 +44,7 @@ const {axios,getToken,user}=useAppContext();
           {/* TABLE HEADER */}
           <thead>
             <tr className="bg-[color:var(--color-primary)/0.2] text-left text-white">
-              <th className="p-3 pl-5 font-medium">User Name</th>
+              <th className="p-3 pl-5 font-medium">User Id</th>
               <th className="p-3 font-medium">Movie Name</th>
               <th className="p-3 font-medium">Show Time</th>
               <th className="p-3 font-medium">Seats</th>
@@ -64,7 +64,7 @@ const {axios,getToken,user}=useAppContext();
                 "
               >
                 <td className="p-3 pl-5">
-                  {item.user.name}
+                  {item.user}
                 </td>
 
                 <td className="p-3">

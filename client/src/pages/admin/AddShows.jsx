@@ -23,15 +23,15 @@ const AddShows = () => {
 
 
   const fetchNowPlayingMovies = async () => {
-    console.log("Hiiiiiiiiiiii")
+   
   try {
-    console.log("Fetching movies")
+   
     const { data } = await axios.get('/api/shows/now-playing'
 , {
       headers: { Authorization: `Bearer ${await getToken()}` }
     });
 
-    console.log("Now Playing API:", data);
+    
 
     if (data.success) {
       setNowPlayingMovies(data.nowPlaying); // FIXED
@@ -139,7 +139,14 @@ const AddShows = () => {
               </div>
             )}
             <p className='font-medium truncate'>{movie.title}</p>
-            <p className='text-gray-400 text-sm'>{movie.release_date}</p>
+           <p className='text-gray-400 text-sm'>
+  {new Date(movie.release_date).toLocaleDateString("en-IN", {
+    year: "numeric",
+    month: "short",
+    day: "numeric"
+  })}
+</p>
+
           </div>
         ))}
       </div>

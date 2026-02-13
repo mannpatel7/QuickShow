@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import { dummyShowsData } from "../../assets/assets";
+import { useEffect, useState } from "react";
 import Loading from "../../components/Loading";
 import Title from "../../components/admin/title";
 import { dateFormat } from "../../lib/dateformat";
@@ -31,6 +30,8 @@ const ListShows = () => {
     getAllShows();
   }
   }, [user]);
+  
+
 
   return !loading ?(
     <>
@@ -45,14 +46,11 @@ const ListShows = () => {
             <th className="p-2 font-medium">Earnings</th>
           </tr>
         </thead>
-        <tbody className="text-sm font-light">
-  {shows.map((show, index) => (
-    <tr
-      key={index}
-      className="border-b border-primary/10 bg-primary/5 even:bg-primary/10"
-    >
+<tbody className="text-sm font-light">
+  {shows.map((show) => (
+    <tr key={show._id} className="border-b border-primary/10 bg-primary/5 even:bg-primary/10">
       <td className="p-2 min-w-45 pl-5">
-        {show.movie.title}
+        {show.movie?.title}
       </td>
 
       <td className="p-2">
@@ -60,18 +58,16 @@ const ListShows = () => {
       </td>
 
       <td className="p-2">
-        {Object.keys(show.occupiedSeats).length}
+        {show.totalBookings ?? 0}
       </td>
 
       <td className="p-2">
-        {currency}
-        {Object.keys(show.occupiedSeats).length * show.showPrice}
+        {currency}{show.totalEarnings ?? 0}
       </td>
     </tr>
   ))}
 </tbody>
-
-      </table>
+</table>
       
       </div>
 

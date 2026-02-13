@@ -78,24 +78,56 @@ const sendBookingConfirmationEmail=inngest.createFunction(
     {event: "app/show.booked"},
     async ({event,step})=>{
         const {bookingId}=event.data;
+        console.log(`[INNGEST] Starting email send for booking: ${bookingId}`);
 
-        const booking=await Booking.findById(bookingId).populate({
-            path:'show',
-            populate:{
-                path:'movie',model:"Movie"
+        const {booking, user, show, movie} = await step.run('fetch-booking-details', async ()=>{
+            console.log(`[INNGEST] Fetching booking: ${bookingId}`);
+            const booking = await Booking.findById(bookingId);
+            if(!booking) {
+                throw new Error(`Booking not found: ${bookingId}`);
             }
-        }).populate('user');
+            console.log(`[INNGEST] Booking found, user ID: ${booking.user}`);
 
-    await sendEmail({
-  to: booking.user.email,
-  subject: `Payment Confirmation – "${booking.show.movie.title}" Booking Successful`,
-  body: `
-Hi ${booking.user.name},
+            const user = await User.findById(booking.user);
+            if(!user) {
+                throw new Error(`User not found: ${booking.user}`);
+            }
+            console.log(`[INNGEST] User found: ${user.email}`);
+
+            const show = await Show.findById(booking.show).populate('movie');
+            if(!show) {
+                throw new Error(`Show not found: ${booking.show}`);
+            }
+            if(!show.movie) {
+                throw new Error(`Movie not found for show: ${booking.show}`);
+            }
+            console.log(`[INNGEST] Show and movie found: ${show.movie.title}`);
+
+            return { booking, user, show, movie: show.movie };
+        });
+
+        await step.run('send-confirmation-email', async ()=>{
+            console.log(`[INNGEST] Preparing email for ${user.email}`);
+            const formattedDate = new Date(show.showDateTime).toLocaleString('en-IN', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            });
+
+            console.log(`[INNGEST] Calling sendEmail function`);
+            return await sendEmail({
+                to: user.email,
+                subject: `Payment Confirmation – "${movie.title}" Booking Successful`,
+                body: `
+Hi ${user.name},
 
 🎉 Payment Successful! Your booking is confirmed.
 
-Movie: ${booking.show.movie.title}
-Date & Time: ${booking.show.time}
+Movie: ${movie.title}
+Date & Time: ${formattedDate}
 Seats: ${booking.bookedSeats.join(", ")}
 Amount Paid: ₹${booking.amount}
 
@@ -103,8 +135,8 @@ Enjoy your show!
 
 – QuickShow Team
 `
-});
-
+            });
+        });
     }
 )
 // Create an empty array where we'll export future Inngest functions

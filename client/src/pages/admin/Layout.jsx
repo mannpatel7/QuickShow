@@ -10,11 +10,11 @@ const Layout = () => {
   const {isAdmin,fetchIsAdmin}=useAppContext()
 
   useEffect(() => {
-  console.log("Layout mounted");
+ 
   fetchIsAdmin();
 }, []);
 
-console.log("isAdmin value:", isAdmin);
+
 
 
 
