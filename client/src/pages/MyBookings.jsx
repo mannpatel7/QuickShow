@@ -37,6 +37,12 @@ const MyBookings = () => {
     useEffect(()=>{
         if(user){getMyBookings()}
     },[user])
+    if(bookings.length===0){
+            return <div className="flex flex-col items-center gap-4 mt-20">
+                <p className="text-gray-400 py-1.5 mt-1.5">You have no bookings yet.</p>
+                <Link to='/movies' className="bg-primary px-4 py-1.5 mb-3 text-sm rounded-full font-medium cursor-pointer">Book Now</Link>
+            </div>
+        }
     return !isLoading ? (
         
     <div className="relative px-6 md:px-16 lg:px40 pt-30 md:pt-40 min-h-[80vh]">
