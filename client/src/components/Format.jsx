@@ -7,18 +7,19 @@ const Format = () => {
 const navigate= useNavigate();
 
   return (
-    <div className='flex flex-col items-start justify-center gap-4 px-6 md:px-16 lg:px-36 bg-[url("/backgroundImage.png")] bg-cover bg-center h-screen'>
+    <div className='w-full min-h-screen flex flex-col items-start justify-center gap-4 px-6 md:px-16 lg:px-36' style={{ backgroundImage: 'linear-gradient(135deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.7) 100%), url("/avengers.jpg")', backgroundSize: 'cover', backgroundPosition: 'center right', backgroundRepeat: 'no-repeat'}}>
+
         <img src={assets.marvelLogo} alt="Marvel Logo" className="max-h-11 lg:h-11 mt-20"/>
-        <h1 className='text-5xl md:text-[70px] md:leading-18 font-semibold max-w-110'>Guardians<br />of the Galaxy</h1>
+        <h1 className='text-5xl md:text-[70px] md:leading-18 font-semibold max-w-110 text-white drop-shadow-lg' style={{textShadow: '2px 2px 8px rgba(0,0,0,0.8)'}}>Avengers</h1>
         <div className='flex items-center gap-4'>
             
             <span className='text-sm font-medium'>Action | Adventure | Sci-fi</span>
             
             <div className='flex items-center gap-1'>
-                <CalendarIcon className='w-4.5 h-4.5' /> 2023
+                <CalendarIcon className='w-4.5 h-4.5' /> 2012
             </div>
             <div className='flex items-center gap-1'>
-                <ClockIcon className='w-4.5 h-4.5' /> 2h 30m
+                <ClockIcon className='w-4.5 h-4.5' /> 2h 23m
             </div>
         </div>
         <p className='text-gray-300 max-w-md'>A group of intergalactic criminals are forced to work together to stop a fanatical warrior from taking control of the universe.</p>

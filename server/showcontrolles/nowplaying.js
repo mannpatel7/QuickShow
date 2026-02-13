@@ -14,7 +14,8 @@ const popularMovies = [
   "Batman",
   "Jawan",
   "Pathaan",
-  "RRR"
+  "RRR",
+  "Guardians of the Galaxy"
 ];
 
 export const getNowPlayingMovies = async (req, res) => {
@@ -108,7 +109,7 @@ export const addShows = async (req, res) => {
 };
 
 
-//api for get all shows
+
 
 export const getAllShows = async (req, res) => {
   try {
@@ -126,11 +127,11 @@ export const getAllShows = async (req, res) => {
 };
 
 
-//api for get show by movie id
+
 
 export const getShow = async (req, res) => {
   try {
-    const { movieId } = req.params; // MongoDB _id
+    const { movieId } = req.params; 
 
     const shows = await Show.find({
       movie: movieId,
