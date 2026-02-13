@@ -3,19 +3,31 @@ import Booking from "../models/Booking.js";
 import Movie from "../models/Movie.js";
 
 
-export const getUserBookings=async (req,res)=>{
+export const getUserBookings = async (req, res) => {
+  try {
+    const user = req.auth().userId;
 
-    try{const user=req.auth().userId;
-    const bookings=await Booking.find({user}).populate({
-        path:'show',
-        populate:{path:'movie'}
-    })
-    res.json({success:true,bookings})
-}catch(error){
-     console.error(error.message);
+    const bookings = await Booking.find({ user })
+      .populate({
+        path: "show",
+        populate: { path: "movie" },
+      });
+
+    // Filter only future bookings
+    const currentDate = new Date();
+
+    const validBookings = bookings.filter(
+      booking => new Date(booking.show.showDateTime) > currentDate
+    );
+
+    res.json({ success: true, bookings: validBookings });
+
+  } catch (error) {
+    console.error(error.message);
     res.status(500).json({ success: false, message: error.message });
-}
-}
+  }
+};
+
 
 export const updateFavourite=async(req,res)=>{
     try{
