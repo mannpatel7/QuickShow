@@ -80,7 +80,19 @@ const AddShows = () => {
         return toast('Missing required fields');
       }
 
-      const showsInput=Object.entries(dateTimeSelection).map(([date,time])=>({date,time}));
+      const tzOffset = (() => {
+        const offset = new Date().getTimezoneOffset();
+        const sign = offset > 0 ? "-" : "+";
+        const absOffset = Math.abs(offset);
+        const hours = String(Math.floor(absOffset / 60)).padStart(2, "0");
+        const minutes = String(absOffset % 60).padStart(2, "0");
+        return `${sign}${hours}:${minutes}`;
+      })();
+
+      const showsInput=Object.entries(dateTimeSelection).map(([date,times])=>({
+        date,
+        time: times.map(t => `${t}${tzOffset}`)
+      }));
 
       const payload={
         movieId:selectedMovie,
