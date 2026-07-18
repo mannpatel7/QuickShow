@@ -5,8 +5,8 @@ import AboutUs from '../pages/AboutUs'
 //it is bassicly from prebuiltui which is very khatarnak library for components
 
 const Footer = () => {
-  return (
-    <footer className="px-6 md:px-16 mt-40 lg:px-36 w-full text-gray-300">
+    return (
+        <footer className="px-6 md:px-16 mt-40 lg:px-36 w-full text-gray-300">
             <div className="flex flex-col md:flex-row justify-between w-full gap-10 border-b border-gray-500 pb-14">
                 <div className="md:max-w-96">
                     <img alt="" className="h-11" src={assets.logo} />
@@ -22,10 +22,10 @@ const Footer = () => {
                     <div>
                         <h2 className="font-semibold mb-5">Company</h2>
                         <ul className="text-sm space-y-2">
-                            <li><Link to="/">Home</Link></li>
-                            <li><Link to="/about">About us</Link></li>
-                            <li><Link to="/contact">Contact us</Link></li>
-                            <li><Link to="/privacy">Privacy policy</Link></li>
+                            <li><Link onClick={() => scrollTo(0, 0)} to="/">Home</Link></li>
+                            <li><Link onClick={() => scrollTo(0, 0)} to="/about">About us</Link></li>
+                            <li><Link onClick={() => scrollTo(0, 0)} to="/contact">Contact us</Link></li>
+                            <li><Link onClick={() => scrollTo(0, 0)} to="/privacy">Privacy policy</Link></li>
                         </ul>
                     </div>
                     <div>
@@ -41,9 +41,9 @@ const Footer = () => {
                 Copyright {new Date().getFullYear()} © QuickShow. All Right Reserved.
             </p>
         </footer>
-  )
-    
-  
+    )
+
+
 }
 
 export default Footer
