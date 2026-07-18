@@ -3,7 +3,7 @@
 
   # 🎬 QuickShow
 
-  **The Ultimate Full-Stack Movie Booking Experience allowing users to browse movies, select seats, and book tickets.**
+  **The Ultimate Full-Stack Movie Booking Experience**
 
   <p align="center">
     <a href="https://reactjs.org/"><img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" /></a>
@@ -24,156 +24,230 @@
   <summary><h2>📖 Table of Contents</h2></summary>
   
   - [Overview](#-overview)
-  - [Tech Stack](#-tech-stack)
+  - [Key Features](#-key-features)
+  - [Tech Stack & Architecture](#-tech-stack--architecture)
   - [Project Structure](#-project-structure)
-  - [Quick Start](#-quick-start)
-  - [Features in Detail](#-features-in-detail)
+  - [API Documentation](#-api-documentation)
+  - [Getting Started](#-getting-started)
   - [Environment Variables](#-environment-variables)
   - [Deployment](#-deployment)
+  - [Contributing & License](#-contributing--license)
 </details>
 
 ---
 
 ## 📋 Overview
 
-QuickShow is a modern, responsive, and seamless movie booking application. It provides end-to-end functionality for users to browse the latest movies, watch trailers, select their preferred seats, and securely purchase tickets.
+**QuickShow** is a robust, production-ready full-stack movie booking application. It is designed to bridge the gap between cinema enthusiasts and theater management. 
 
-### Key Features
-
-<details>
-<summary><b>View Features</b></summary>
-<ul>
-  <li><b>👤 User Authentication</b>: Secure login and registration</li>
-  <li><b>🎥 Movie Discovery</b>: Browse, search, and view detailed information with trailers</li>
-  <li><b>💺 Interactive Seat Selection</b>: Real-time visual seat map to pick your favorite spot</li>
-  <li><b>💳 Secure Payments</b>: Integrated with Stripe for safe and fast checkout</li>
-  <li><b>🛡️ Admin Dashboard</b>: Comprehensive dashboard for managing shows and bookings</li>
-</ul>
-</details>
+For **users**, it offers a seamless and highly responsive interface to discover new movies, watch trailers, select exact seats from an interactive theater map, and pay securely using Stripe.
+For **administrators**, QuickShow provides a dedicated portal to manage the movie catalog, schedule showtimes, and monitor booking analytics in real-time.
 
 ---
 
-## 🛠️ Tech Stack
+## ✨ Key Features
 
-| Frontend 🎨 | Backend ⚙️ | Infrastructure 🚀 |
+### 👤 For Users (Moviegoers)
+- **Authentication & Security:** Secure JWT-based registration and login, including password encryption using bcrypt.
+- **Dynamic Movie Catalog:** Browse currently showing and upcoming movies. Features include search functionality, category filtering, and detailed movie pages with embedded trailers.
+- **Interactive Seat Selection:** A visual representation of the cinema hall where users can click to select available seats. Real-time lock mechanisms prevent double-booking.
+- **Secure Checkout via Stripe:** Integration with Stripe Elements for handling secure card payments, complete with webhooks to verify transactions.
+- **User Dashboard:** A personalized space to view past bookings, upcoming tickets, and account details.
+
+### 🛡️ For Administrators (Theater Management)
+- **Movie Management:** Add, edit, and delete movie entries including uploading posters and updating metadata (director, cast, duration).
+- **Showtime Scheduling:** Allocate movies to specific screens at specific times, setting dynamic pricing if necessary.
+- **Booking Oversight:** Access a master list of all bookings to handle refunds, cancellations, and user support.
+
+---
+
+## 🛠️ Tech Stack & Architecture
+
+This project adopts a modern MERN-like stack, utilizing Vite for an ultra-fast frontend build process and Tailwind CSS for rapid UI development.
+
+| Domain | Technologies Used | Purpose |
 | :--- | :--- | :--- |
-| **React** | **Node.js** & **Express** | **Vercel** (Hosting) |
-| **Vite** | **MongoDB** & **Mongoose** | **MongoDB Atlas** |
-| **Tailwind CSS** | **Stripe** (Payments) | |
-| **Context API** | **Inngest** (Background Jobs) | |
-| **React Router** |  | |
+| **Frontend** | React 18, Vite | UI library and fast bundler |
+| **Styling** | Tailwind CSS | Utility-first CSS for responsive design |
+| **State/Routing** | Context API, React Router v6 | Global state management and client-side routing |
+| **Backend** | Node.js, Express.js | High-performance asynchronous REST API |
+| **Database** | MongoDB, Mongoose ODM | Flexible NoSQL document storage and schema validation |
+| **Payments** | Stripe API | Secure, PCI-compliant payment processing |
+| **Background Jobs** | Inngest | Managing asynchronous tasks |
 
 ---
 
 ## 📂 Project Structure
 
+A comprehensive look at the repository architecture:
+
 ```text
 QuickShow/
-├── server/               # Node.js Express server
-│   ├── ...               # Backend code
-│   └── package.json
-├── client/               # React Vite application
-│   ├── src/              # Frontend code
-│   └── package.json
-└── README.md             # This file
+├── client/                      # Frontend (React + Vite)
+│   ├── public/                  # Static assets
+│   ├── src/                     
+│   │   ├── api/                 # Axios interceptors and API call definitions
+│   │   ├── components/          # Reusable UI components (Buttons, Modals, Cards)
+│   │   ├── context/             # React Context for Auth and Cart state
+│   │   ├── pages/               # Top-level route components (Home, Movie, Checkout)
+│   │   ├── utils/               # Helper functions and formatters
+│   │   ├── App.jsx              # Main application wrapper & Router setup
+│   │   └── index.css            # Global Tailwind imports
+│   └── package.json             # Frontend dependencies
+│
+├── server/                      # Backend (Node.js + Express)
+│   ├── controllers/             # Request handlers (logic for auth, movies, bookings)
+│   ├── middlewares/             # JWT verification, error handling, input validation
+│   ├── models/                  # Mongoose schemas (User, Movie, Show, Booking)
+│   ├── routes/                  # API route definitions
+│   ├── config/                  # Database connection and third-party setups
+│   ├── server.js                # Express app initialization
+│   └── package.json             # Backend dependencies
+│
+└── README.md                    # Project documentation
 ```
 
 ---
 
-## 🚀 Quick Start
+## 📡 API Documentation
+
+Below is a high-level overview of the exposed REST endpoints.
+
+<details>
+<summary><b>Authentication & Users (<code>/api/auth</code> & <code>/api/users</code>)</b></summary>
+
+- `POST /api/auth/register` - Create a new user account
+- `POST /api/auth/login` - Authenticate user and return JWT
+- `GET /api/users/profile` - Get current logged-in user profile
+</details>
+
+<details>
+<summary><b>Movies & Shows (<code>/api/movies</code> & <code>/api/shows</code>)</b></summary>
+
+- `GET /api/movies` - Retrieve all movies (supports search/filter queries)
+- `GET /api/movies/:id` - Retrieve specific movie details
+- `POST /api/movies` - (Admin) Add a new movie
+- `GET /api/shows` - Get all scheduled shows
+- `GET /api/shows/:movieId` - Get available showtimes for a specific movie
+</details>
+
+<details>
+<summary><b>Bookings & Payments (<code>/api/bookings</code>)</b></summary>
+
+- `POST /api/bookings` - Create a new booking (requires authentication)
+- `GET /api/bookings/my-bookings` - Fetch booking history for the user
+- `POST /api/bookings/create-payment-intent` - Initialize Stripe payment session
+</details>
+
+---
+
+## 🚀 Getting Started
+
+Follow these instructions to set up a local development environment.
 
 ### Prerequisites
-- Node.js 16+
-- MongoDB Atlas account (or local MongoDB)
-- Stripe account (for payment keys)
+Before you begin, ensure you have installed:
+- [Node.js](https://nodejs.org/en/) (v16.0.0 or higher)
+- A [MongoDB Atlas](https://www.mongodb.com/atlas) account (or a local MongoDB instance running)
+- A [Stripe Developer](https://stripe.com/) account to acquire API keys
 
-<details>
-<summary><b>Backend Setup</b></summary>
+### Step-by-Step Installation
 
-```bash
-cd server
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/mannpatel7/QuickShow.git
+   cd QuickShow
+   ```
 
-# Install dependencies
-npm install
+2. **Backend Setup**
+   Open a terminal and navigate to the server directory:
+   ```bash
+   cd server
+   npm install
+   ```
+   *Create a `.env` file based on the Environment Variables section below, then start the server:*
+   ```bash
+   npm run dev
+   ```
 
-# Set up environment variables (see Environment Variables section)
-
-# Start server
-npm start
-```
-</details>
-
-<details>
-<summary><b>Frontend Setup</b></summary>
-
-```bash
-cd client
-
-# Install dependencies
-npm install
-
-# Set up environment variables (see Environment Variables section)
-
-# Start dev server
-npm run dev
-```
-</details>
+3. **Frontend Setup**
+   Open a new terminal window and navigate to the client directory:
+   ```bash
+   cd client
+   npm install
+   ```
+   *Create a `.env` file, then start the Vite development server:*
+   ```bash
+   npm run dev
+   ```
 
 ---
 
 ## 🔑 Environment Variables
 
-<details>
-<summary><b>Server (.env)</b></summary>
+For the application to function correctly, you must configure the following environment variables in their respective directories.
+
+<details open>
+<summary><b>Server Configuration (<code>server/.env</code>)</b></summary>
 
 ```env
+# Application Port
 PORT=5000
-MONGODB_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret
-STRIPE_SECRET_KEY=your_stripe_secret
+
+# MongoDB Connection String
+MONGODB_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/quickshow?retryWrites=true&w=majority
+
+# JWT Authentication
+JWT_SECRET=your_super_secret_jwt_key_here
+JWT_EXPIRES_IN=30d
+
+# Stripe Payment Integration
+STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
+STRIPE_WEBHOOK_SECRET=whsec_your_stripe_webhook_secret
 ```
 </details>
 
-<details>
-<summary><b>Client (.env)</b></summary>
+<details open>
+<summary><b>Client Configuration (<code>client/.env</code>)</b></summary>
 
 ```env
-VITE_API_URL=https://quickshowserver-mocha.vercel.app/api
-VITE_STRIPE_PUBLIC_KEY=your_stripe_public_key
+# Backend API URL (Use localhost for local development)
+VITE_API_URL=http://localhost:5000/api
+# Or for production testing:
+# VITE_API_URL=https://quickshowserver-mocha.vercel.app/api
+
+# Stripe Public Key
+VITE_STRIPE_PUBLIC_KEY=pk_test_your_stripe_public_key
 ```
 </details>
-
----
-
-## 🎯 Features in Detail
-
-### User Experience
-- Clean, intuitive interface for browsing movies
-- Real-time seat booking logic
-- Saved bookings accessible in user profile
-
-### Admin Capabilities
-- Add, edit, or remove movies and showtimes
-- Track and manage all user bookings
-- View insights into sales and popular shows
 
 ---
 
 ## 📊 Deployment
 
-### Frontend
-- Deployed on Vercel: [https://quick-show-fro.vercel.app/](https://quick-show-fro.vercel.app/)
+The application is configured for seamless deployment to modern cloud platforms.
 
-### Backend
-- Deployed on Vercel: [https://quickshowserver-mocha.vercel.app/](https://quickshowserver-mocha.vercel.app/)
+- **Frontend (Vercel):** The Vite React app is deployed directly via Vercel. Continuous Integration triggers a new build on every push to the main branch.  
+  👉 [Live Frontend App](https://quick-show-fro.vercel.app/)
+  
+- **Backend (Vercel):** The Express server is deployed as a serverless function on Vercel. Ensure `vercel.json` is correctly configured to handle API routing.  
+  👉 [Live Backend API](https://quickshowserver-mocha.vercel.app/)
 
-### Database
-- MongoDB Atlas for cloud database storage
+- **Database:** Hosted securely on MongoDB Atlas with IP whitelisting and automated backups.
 
 ---
 
-## 📝 License
+## 🤝 Contributing & License
 
+Contributions, issues, and feature requests are welcome! 
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+**License**
 Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
