@@ -1,10 +1,11 @@
 import React, { useMemo } from "react";
 import MovieCard from "../components/MovieCard";
+import ShimmerCard from "../components/ShimmerCard";
 import BlurCircle from "../components/BlurCircle";
 import { useAppContext } from "../context/AppContext";
 
 const Movies = () => {
-  const { shows } = useAppContext();
+  const { shows, isLoadingShows } = useAppContext();
 
   const uniqueMovies = useMemo(() => {
     if (!shows) return [];
@@ -17,7 +18,20 @@ const Movies = () => {
     return Array.from(map.values());
   }, [shows]);
 
-  return uniqueMovies.length > 0 ? (
+  return isLoadingShows ? (
+    <div className="relative my-40 mb-60 px-8 md:px-16 lg:px-40 xl:px-44 overflow-hidden min-h-[80vh]">
+      <BlurCircle top="150px" left="0px" />
+      <BlurCircle bottom="50px" right="50px" />
+
+      <h1 className="text-lg font-medium mb-8">Now Showing</h1>
+
+      <div className="grid grid-cols-1 place-items-center md:grid-cols-3 lg:grid-cols-4 gap-8">
+        {Array.from({ length: 8 }).map((_, index) => (
+          <ShimmerCard key={index} />
+        ))}
+      </div>
+    </div>
+  ) : uniqueMovies.length > 0 ? (
     <div className="relative my-40 mb-60 px-8 md:px-16 lg:px-40 xl:px-44 overflow-hidden min-h-[80vh]">
       <BlurCircle top="150px" left="0px" />
       <BlurCircle bottom="50px" right="50px" />

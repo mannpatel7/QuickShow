@@ -15,6 +15,7 @@ export const AppProvider=({children})=>{
     const [isAdmin,setIsAdmin]=useState(null)
     const [shows,setShows]=useState([])
     const [favoriteMovies,setFavoriteMovies]=useState([])
+    const [isLoadingShows, setIsLoadingShows]=useState(true)
 
     const {user}=useUser()
     const {getToken}=useAuth()
@@ -39,6 +40,7 @@ export const AppProvider=({children})=>{
     }
 
     const fetchShows=async()=>{
+        setIsLoadingShows(true)
         try {
             const {data}=await axios.get('/api/shows/all')
             console.log("Shows API response", data);
@@ -49,6 +51,8 @@ export const AppProvider=({children})=>{
             }
         } catch (error) {
             console.error(error)
+        } finally {
+            setIsLoadingShows(false)
         }
     }
 
@@ -83,7 +87,7 @@ export const AppProvider=({children})=>{
     const value={axios,
         fetchIsAdmin,
         user,getToken,navigate,isAdmin,shows,
-        favoriteMovies,fetchFavoriteMovies
+        favoriteMovies,fetchFavoriteMovies,isLoadingShows
     }
     return (
         <AppContext.Provider value={value}>

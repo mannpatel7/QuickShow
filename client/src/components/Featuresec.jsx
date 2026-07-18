@@ -3,11 +3,12 @@ import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BlurCircle from './BlurCircle';
 import MovieCard from './MovieCard';
+import ShimmerCard from './ShimmerCard';
 import { useAppContext } from '../context/AppContext';
 
 const Featuresec = () => {
   const navigate = useNavigate();
-  const { shows } = useAppContext();
+  const { shows, isLoadingShows } = useAppContext();
 
   // ✅ REMOVE DUPLICATE MOVIES FROM SHOWS
   const uniqueMovies = useMemo(() => {
@@ -42,9 +43,15 @@ const Featuresec = () => {
 
       {/* ✅ USE uniqueMovies INSTEAD OF shows */}
       <div className='flex flex-wrap max-sm:justify-center gap-8 mt-8'>
-        {uniqueMovies.slice(0, 4).map(movie => (
-          <MovieCard key={movie._id} movie={movie} />
-        ))}
+        {isLoadingShows ? (
+          Array.from({ length: 4 }).map((_, index) => (
+            <ShimmerCard key={index} />
+          ))
+        ) : (
+          uniqueMovies.slice(0, 4).map(movie => (
+            <MovieCard key={movie._id} movie={movie} />
+          ))
+        )}
       </div>
 
       <div className='flex flex-col justify-center md:flex-row items-center md:items-stretch gap-6 mb-20'>
